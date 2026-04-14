@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { DynamicScroller, DynamicScrollerItem } from 'vue-virtual-scroller'
 import 'vue-virtual-scroller/dist/vue-virtual-scroller.css'
 import { useAutoScroll } from '../composables/useAutoScroll'
@@ -41,12 +41,31 @@ const {
 useStreamRenderer({
   activeSession: sessionRef,
   scrollToBottom,
-  cadence: 18
+  cadence: 110
 })
 
 onMounted(() => {
   jumpToLatest()
 })
+
+watch(
+  () => messages.value.map((message) => message.id).join('|'),
+  async (currentIds, previousIds) => {
+    if (!currentIds || currentIds === previousIds) {
+      return
+    }
+
+    const latestMessage = messages.value.at(-1)
+    await nextTick()
+
+    if (latestMessage?.role === 'assistant' && latestMessage.streaming) {
+      jumpToLatest()
+      return
+    }
+
+    scrollToBottom()
+  }
+)
 </script>
 
 <template>

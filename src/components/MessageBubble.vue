@@ -29,6 +29,10 @@ const displayedContent = computed(() => {
   return props.message.renderedContent ?? props.message.content
 })
 
+const hasVisibleContent = computed(() => {
+  return Boolean(displayedContent.value?.trim())
+})
+
 const createdAt = computed(() => {
   return new Intl.DateTimeFormat('zh-CN', {
     month: '2-digit',
@@ -56,7 +60,16 @@ const isAssistant = computed(() => props.message.role === 'assistant')
     </div>
 
     <div v-if="isAssistant" class="message-bubble__rich">
-      <MarkdownRenderer :content="displayedContent" />
+      <div
+        v-if="message.streaming && !hasVisibleContent"
+        class="message-bubble__pending"
+      >
+        <span class="message-bubble__pending-dot" />
+        <span class="message-bubble__pending-dot" />
+        <span class="message-bubble__pending-dot" />
+        <span class="message-bubble__pending-text">研究助手正在组织回应...</span>
+      </div>
+      <MarkdownRenderer v-else :content="displayedContent" />
       <span v-if="message.streaming" class="message-bubble__cursor" />
     </div>
 
@@ -128,6 +141,34 @@ const isAssistant = computed(() => props.message.role === 'assistant')
   gap: 8px;
 }
 
+.message-bubble__pending {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  color: #54706a;
+}
+
+.message-bubble__pending-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #205953;
+  animation: bubble-pulse 1.2s ease-in-out infinite;
+}
+
+.message-bubble__pending-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.message-bubble__pending-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.message-bubble__pending-text {
+  margin-left: 4px;
+}
+
 .message-bubble__cursor {
   display: inline-block;
   width: 9px;
@@ -142,6 +183,19 @@ const isAssistant = computed(() => props.message.role === 'assistant')
 @keyframes blink {
   50% {
     opacity: 0;
+  }
+}
+
+@keyframes bubble-pulse {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 </style>
