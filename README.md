@@ -1,325 +1,312 @@
-<img width="2878" height="1686" alt="image" src="https://github.com/user-attachments/assets/2cb94414-5e52-4941-957f-ffcb6c78642f" />
-改三个地方，<img width="484" height="92" alt="QQ_1772809677178" src="https://github.com/user-attachments/assets/f5ae93b0-2d1f-413d-8e05-4a90caf58aee" />
-<img width="1250" height="510" alt="QQ_1772809690100" src="https://github.com/user-attachments/assets/fab00fef-356c-408a-beaf-137fe1c83663" />
-然后<img width="1776" height="738" alt="QQ_1772809705656" src="https://github.com/user-attachments/assets/a758d347-b4f6-4d60-ae18-a3f70bb47b3c" />
+# 智能心理对话研究系统
 
+基于大语言模型的心理健康研究工作台，支持多轮心理对话、流式回复、语音输入与录音留存、结构化情绪/风险分析、会话归档筛选和研究数据导出。
 
-# AI聊天应用教程
+项目由前端研究工作台和后端模型网关两部分组成：
 
-这是一个基于 Vue 3 + Node.js 构建的AI聊天应用教学项目，实现了与讯飞MaaS平台的集成，支持流式对话功能。
+- 前端：`Vue 3 + Vite + Pinia + Vue Router`
+- 后端：`Node.js + Express`
+- 语音能力：`Web Speech API + MediaRecorder`
+- 富文本与性能优化：`Markdown-it + Highlight.js + vue-virtual-scroller`
+- 模型接入：讯飞 MaaS 推理服务（当前已验证可用配置）
+
+## 主要能力
+
+- 多轮心理对话研究工作台
+- LLM 流式输出与逐字渲染
+- 心理对话结构化分析协议
+- 情绪分类、风险分层、干预建议展示
+- 语音转写、录音留存与音频元数据分析
+- 会话历史缓存与上下文恢复
+- 会话归档筛选与 JSON/CSV 导出
+- 组件懒加载与虚拟列表渲染
+- Markdown 富文本渲染与代码高亮
 
 ## 技术栈
 
 ### 前端
-- Vue 3 (Composition API)
+
+- Vue 3
 - Vite
-- Element Plus
-- CSS3
+- Pinia
+- Vue Router
+- Markdown-it
+- Highlight.js
+- vue-virtual-scroller
 
 ### 后端
+
 - Node.js
-- 原生HTTP模块
-- HTTPS模块
+- Express
 - dotenv
+- multer
+- cors
 
-### AI服务
-- 讯飞MaaS平台 (xop3qwen1b7模型)
+### 模型与音频
 
-## 项目架构
+- 讯飞 MaaS 推理服务
+- Web Speech API
+- MediaRecorder
 
+## 项目结构
+
+```text
+yuan-chat-vue/
+├─ backend/                    # 后端模型网关与音频上传服务
+│  ├─ index.js                 # 后端主服务
+│  ├─ .env.example             # 后端环境变量示例
+│  └─ uploads/audio/           # 录音留存目录（运行后生成）
+├─ src/
+│  ├─ components/              # 业务高内聚组件
+│  ├─ composables/             # 组合式逻辑
+│  ├─ modules/research/        # 研究域逻辑
+│  ├─ services/                # LLM / 音频 / 导出 / 缓存服务
+│  ├─ stores/                  # Pinia 状态中心
+│  ├─ views/                   # 页面视图
+│  ├─ App.vue                  # 应用壳层
+│  └─ main.js                  # 前端入口
+├─ .env.example                # 前端环境变量示例
+└─ .env.local                  # 前端本地接口配置（可自行创建）
 ```
-├── backend/          # 后端服务
-│   ├── index.js     # 主服务器文件
-│   ├── package.json # 后端依赖
-│   └── .env         # 环境变量配置
-├── src/             # 前端代码
-│   ├── views/       # 页面组件
-│   │   └── AIVIew.vue # AI聊天页面
-│   ├── components/  # 通用组件
-│   ├── main.js      # 前端入口
-│   └── App.vue      # 根组件
-├── index.html       # HTML模板
-├── package.json     # 前端依赖
-└── vite.config.js   # Vite配置
+
+## 当前讯飞接入说明
+
+项目当前已验证可用的讯飞接入方式为：
+
+- `base_url`: `https://maas-api.cn-huabei-1.xf-yun.com/v2`
+- `model`: `xop35qwen2b`
+- `Authorization`: `Bearer APIKey:APISecret`
+
+也就是说，后端里使用的是：
+
+```env
+LLM_API_KEY=your_api_key:your_api_secret
+LLM_BASE_URL=https://maas-api.cn-huabei-1.xf-yun.com/v2
+LLM_MODEL=xop35qwen2b
+LLM_ANALYSIS_MODEL=xop35qwen2b
 ```
-
-## 核心功能
-
-1. **实时流式对话**：与AI模型进行实时的流式交互，逐字显示回复内容
-2. **消息历史管理**：自动维护对话历史，支持上下文理解
-3. **响应式UI设计**：适配不同屏幕尺寸的现代化界面
-4. **优雅的错误处理**：完善的错误提示和边界情况处理
-
-## 前置条件
-
-- Node.js 16+ 环境
-- 讯飞开放平台账号 (获取API密钥)
-- Git (可选)
 
 ## 快速开始
 
 ### 1. 克隆项目
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/DDD340-OPS/yuan-chat-vue.git
 cd yuan-chat-vue
 ```
 
-### 2. 配置环境变量
+### 2. 安装依赖
 
-在 `backend/` 目录下创建 `.env` 文件：
+前端：
 
-```env
-# 讯飞MaaS平台API密钥
-XUNFEI_API_KEY=your-api-key-here
-
-# 服务器端口
-PORT=3000
-```
-
-### 3. 安装依赖
-
-#### 前端依赖
 ```bash
 npm install
 ```
 
-#### 后端依赖
+后端：
+
 ```bash
 cd backend
 npm install
 cd ..
 ```
 
-### 4. 启动服务
+### 3. 配置前端环境变量
 
-#### 启动后端服务
+在项目根目录创建 `.env.local`：
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+### 4. 配置后端环境变量
+
+在 `backend/` 目录创建 `.env`：
+
+```env
+PORT=3000
+LLM_API_KEY=your_api_key:your_api_secret
+LLM_BASE_URL=https://maas-api.cn-huabei-1.xf-yun.com/v2
+LLM_MODEL=xop35qwen2b
+LLM_ANALYSIS_MODEL=xop35qwen2b
+LLM_TEMPERATURE=0.6
+LLM_MAX_TOKENS=1200
+AUDIO_UPLOAD_DIR=uploads/audio
+```
+
+### 5. 启动后端
+
 ```bash
 cd backend
 npm run dev
 ```
 
-后端服务将运行在 `http://localhost:3000`
+后端启动后可访问：
 
-#### 启动前端服务
-在新的终端窗口中：
+- 健康检查：`http://localhost:3000/health`
+
+### 6. 启动前端
+
+在项目根目录新开终端：
+
 ```bash
 npm run dev
 ```
 
-前端应用将运行在 `http://localhost:5173`
+前端默认运行在：
 
-### 5. 访问应用
+- `http://localhost:5173`
 
-打开浏览器访问 `http://localhost:5173`，即可开始与AI聊天！
+## 已实现页面
 
-## 核心代码解析
+- `研究总览`
+- `研究工作台`
+- `会话归档`
+- `系统设计`
 
-### 后端实现 (backend/index.js)
+## 研究工作台功能
 
-#### HTTP服务器创建
-```javascript
-const http = require('http');
-const server = http.createServer((req, res) => {
-  // 设置CORS头
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  // 处理请求...
-});
+### 对话能力
+
+- 多轮上下文管理
+- 流式响应渲染
+- 结构化分析事件接收
+- Markdown 富文本显示
+
+### 语音能力
+
+- 语音识别转写
+- 浏览器录音采集
+- 录音文件上传
+- 音频留存列表展示
+
+### 研究分析能力
+
+- 情绪状态展示
+- 风险等级展示
+- 干预建议展示
+- 推荐追问展示
+- 标签与上下文记忆沉淀
+
+### 研究管理能力
+
+- 本地缓存恢复
+- 会话归档筛选
+- 研究数据导出
+- 实验配置面板
+
+## 关键接口
+
+### 后端健康检查
+
+```http
+GET /health
 ```
 
-#### API端点处理
-```javascript
-// 处理POST请求到/api/chat
-if (req.method === 'POST' && req.url === '/api/chat') {
-  let body = '';
-  req.on('data', (chunk) => { body += chunk; });
-  req.on('end', () => {
-    const requestData = JSON.parse(body);
-    handleStreamRequest(requestData.messages, res);
-  });
-}
+### 对话流式接口
+
+```http
+POST /api/chat
 ```
 
-#### 流式响应处理
-```javascript
-function handleStreamRequest(messages, res) {
-  // 构造请求体
-  const requestBody = {
-    model: 'xop3qwen1b7',
-    messages: messages,
-    max_tokens: 4000,
-    temperature: 0.7,
-    stream: true
-  };
-  
-  // 发送HTTPS请求到MaaS平台
-  const maasReq = https.request(options, (maasRes) => {
-    // 设置SSE响应头
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    
-    // 直接将MaaS响应传递给客户端
-    maasRes.pipe(res);
-  });
-  
-  maasReq.write(JSON.stringify(requestBody));
-  maasReq.end();
-}
-```
+请求体示例：
 
-### 前端实现 (src/views/AIVIew.vue)
-
-#### 消息发送处理
-```javascript
-const sendMessage = async () => {
-  if (!inputMessage.value.trim() || isGenerating.value) return;
-  
-  // 添加用户消息
-  const userMessage = { /* ... */ };
-  messages.value.push(userMessage);
-  
-  isGenerating.value = true;
-  
-  try {
-    // 调用后端API
-    const response = await fetch('http://localhost:3000/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: apiMessages })
-    });
-    
-    // 处理流式响应
-    await handleStreamResponse(response);
-  } catch (error) {
-    ElMessage.error('获取AI回复失败');
-  } finally {
-    isGenerating.value = false;
-  }
-};
-```
-
-#### 流式响应处理
-```javascript
-const handleStreamResponse = async (response) => {
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  
-  let aiReply = { /* ... */ };
-  messages.value.push(aiReply);
-  
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    
-    const chunk = decoder.decode(value, { stream: true });
-    const lines = chunk.split('\n');
-    
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        const data = line.slice(6).trim();
-        if (data === '[DONE]') break;
-        
-        const json = JSON.parse(data);
-        const content = json.choices[0].delta.content;
-        if (content) {
-          aiReply.content += content;
-          messages.value = [...messages.value];
-          scrollToBottom();
-        }
-      }
+```json
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "最近总是睡不好，我有点焦虑。"
     }
+  ],
+  "sessionContext": {
+    "summary": "初始测试会话",
+    "interventionFocus": "支持性倾听",
+    "riskLevel": "低",
+    "researchTags": ["测试"]
+  },
+  "experimentConfig": {
+    "structuredAnalysis": true,
+    "model": "xop35qwen2b",
+    "analysisModel": "xop35qwen2b",
+    "temperature": 0.6,
+    "maxTokens": 800
   }
-};
+}
 ```
 
-## 部署建议
+流式事件类型包括：
 
-### 开发环境
-- 使用 `npm run dev` 启动服务
-- 前端支持热重载
+- `open`
+- `delta`
+- `analysis`
+- `done`
+- `error`
 
-### 生产环境
-1. 构建前端生产版本：
+### 音频上传接口
+
+```http
+POST /api/audio/upload
+```
+
+字段包括：
+
+- `audio`
+- `sessionId`
+- `transcript`
+- `durationMs`
+
+## 本地构建
+
+前端生产构建：
+
 ```bash
 npm run build
 ```
 
-2. 配置Nginx反向代理：
-```nginx
-server {
-    listen 80;
-    server_name example.com;
-    
-    location / {
-        root /path/to/dist;
-        index index.html;
-        try_files $uri $uri/ /index.html;
-    }
-    
-    location /api/ {
-        proxy_pass http://localhost:3000/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
+后端语法检查：
 
-3. 使用PM2管理后端进程：
 ```bash
-cd backend
-pm install pm2 -g
-pm start
+node --check backend/index.js
 ```
 
 ## 常见问题
 
-### 1. API请求失败
-- 检查 `.env` 文件中的API密钥是否正确
-- 确保网络连接正常，能够访问讯飞MaaS平台
-- 查看后端日志了解具体错误信息
+### 1. 前端打开后仍然走 Mock 模式
 
-### 2. 流式响应不显示
-- 检查浏览器控制台是否有JavaScript错误
-- 确认后端服务正常运行
-- 验证网络请求是否成功
+检查根目录是否存在：
 
-### 3. 前端样式异常
-- 检查Element Plus是否正确安装
-- 清除浏览器缓存
-- 查看控制台是否有CSS错误
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
 
-## 扩展学习
+修改后需要重启前端开发服务。
 
-### 功能扩展建议
-1. 添加多模型选择功能
-2. 实现消息保存和加载
-3. 增加用户身份认证
-4. 添加语音输入/输出功能
-5. 支持文件上传和处理
+### 2. 讯飞接口返回鉴权错误
 
-### 技术深入学习
-- Vue 3 Composition API 官方文档
-- Node.js 流处理机制
-- Server-Sent Events (SSE) 协议
-- 讯飞MaaS平台 API 文档
+请优先检查：
 
-## 贡献指南
+- `LLM_BASE_URL` 是否是 `https://maas-api.cn-huabei-1.xf-yun.com/v2`
+- `LLM_MODEL` 是否和服务卡片一致
+- `LLM_API_KEY` 是否使用 `APIKey:APISecret` 的完整形式
+- 当前凭证是否已被授权调用对应模型服务
 
-欢迎提交Issue和Pull Request来改进这个项目！
+### 3. 语音按钮不可用
+
+请确认：
+
+- 浏览器支持 `Web Speech API`
+- 已授权麦克风权限
+- 使用的是支持 `MediaRecorder` 的现代浏览器
+
+## 后续可继续扩展
+
+- 更专业的情绪识别与量表评估
+- 数据库持久化替代 localStorage
+- 多研究员协作与权限管理
+- 音频声学特征分析
+- 模型切换与实验版本管理
 
 ## 许可证
 
-MIT License
-
-## 联系方式
-
-如有问题或建议，请通过以下方式联系：
-- GitHub Issues: <repository-issues-url>
-- 电子邮件: <your-email>
-
----
-
-**享受AI聊天的乐趣！** 🤖💬
+MIT
