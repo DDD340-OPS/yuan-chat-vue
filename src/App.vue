@@ -1,163 +1,358 @@
 <script setup>
-// 导入Element Plus图标
-import { 
-  HomeFilled, 
-  List, 
-  Document, 
-  Setting,
-  ChatRound
-} from '@element-plus/icons-vue'
+import { computed } from 'vue'
+import { RouterView, useRoute } from 'vue-router'
+import { useResearchStore } from './stores/research'
+
+const route = useRoute()
+const researchStore = useResearchStore()
+
+const navItems = [
+  {
+    to: '/',
+    label: '研究总览',
+    caption: '目标、能力与当前样本状态'
+  },
+  {
+    to: '/workbench',
+    label: '研究工作台',
+    caption: '多轮心理对话、流式输出与语音输入'
+  },
+  {
+    to: '/archive',
+    label: '会话归档',
+    caption: '历史记录回溯与样本横向观察'
+  },
+  {
+    to: '/system',
+    label: '系统设计',
+    caption: '模块边界、接口和扩展计划'
+  }
+]
+
+const activePage = computed(() => {
+  return navItems.find((item) => item.to === route.path) ?? navItems[0]
+})
+
+const systemBadges = computed(() => {
+  return [
+    `${researchStore.sessionCount} 个研究会话`,
+    `${researchStore.totalMessageCount} 条消息`,
+    researchStore.connectionLabel
+  ]
+})
 </script>
 
 <template>
-  <div class="app-container">
-    <!-- 使用Element Plus的Container布局组件 -->
-    <el-container style="height: 100vh;">
-      <!-- 侧边栏 -->
-      <el-aside width="200px" style="background-color: #001529;">
-        <!-- 系统标题 -->
-        <div class="logo-container">
-          <h1 class="logo-text">Todo 系统</h1>
-        </div>
-        
-        <!-- 使用Element Plus的Menu组件实现导航菜单 -->
-        <el-menu
-          default-active="/"
-          class="sidebar-menu"
-          background-color="#001529"
-          text-color="#fff"
-          active-text-color="#ffd04b"
-          router
+  <div class="shell">
+    <aside class="shell-sidebar">
+      <div class="brand-card">
+        <p class="brand-card__eyebrow">Mental Health NLP Lab</p>
+        <h1>智能心理对话研究系统</h1>
+        <p class="brand-card__copy">
+          面向心理健康研究的多轮会话工作台，覆盖历史回溯、上下文理解、
+          流式生成与语音输入采集。
+        </p>
+      </div>
+
+      <nav class="nav-list" aria-label="主导航">
+        <RouterLink
+          v-for="item in navItems"
+          :key="item.to"
+          :to="item.to"
+          class="nav-item"
+          :class="{ 'nav-item--active': route.path === item.to }"
         >
-          <el-menu-item index="/">
-            <template #title>
-              <el-icon><HomeFilled /></el-icon>
-              <span>首页</span>
+          <span class="nav-item__label">{{ item.label }}</span>
+          <span class="nav-item__caption">{{ item.caption }}</span>
+        </RouterLink>
+      </nav>
+
+      <div class="sidebar-note">
+        <p class="sidebar-note__title">当前研究焦点</p>
+        <p>{{ researchStore.activeSession?.interventionFocus ?? '等待建立首个样本' }}</p>
+        <div class="sidebar-note__chips">
+          <span
+            v-for="tag in researchStore.activeSession?.researchTags ?? []"
+            :key="tag"
+          >
+            {{ tag }}
+          </span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="shell-main">
+      <header class="shell-header">
+        <div>
+          <p class="shell-header__eyebrow">Research Console</p>
+          <h2>{{ activePage.label }}</h2>
+          <p class="shell-header__caption">
+            {{ activePage.caption }}
+          </p>
+        </div>
+
+        <div class="shell-header__badges">
+          <span v-for="badge in systemBadges" :key="badge">{{ badge }}</span>
+        </div>
+      </header>
+
+      <section class="safety-banner">
+        研究用途提醒：当前框架用于心理对话流程验证与交互研究，不替代临床诊断或紧急援助。
+      </section>
+
+      <main class="shell-content">
+        <RouterView v-slot="{ Component }">
+          <Suspense>
+            <template #default>
+              <component :is="Component" />
             </template>
-          </el-menu-item>
-          
-          <el-menu-item index="/todo">
-            <template #title>
-              <el-icon><List /></el-icon>
-              <span>待办列表</span>
+            <template #fallback>
+              <div class="route-skeleton">
+                正在加载页面模块...
+              </div>
             </template>
-          </el-menu-item>
-          
-          <el-menu-item index="/about">
-            <template #title>
-              <el-icon><Document /></el-icon>
-              <span>关于系统</span>
-            </template>
-          </el-menu-item>
-          
-          <el-menu-item index="/ai">
-            <template #title>
-              <el-icon><ChatRound /></el-icon>
-              <span>AI对话</span>
-            </template>
-          </el-menu-item>
-        </el-menu>
-      </el-aside>
-      
-      <!-- 主内容区 -->
-      <el-container>
-        <!-- 顶部导航栏 -->
-        <el-header style="background-color: #fff; border-bottom: 1px solid #e6e6e6; display: flex; align-items: center; padding: 0 20px;">
-          <!-- 左侧占位元素 -->
-          <div style="flex: 1;"></div>
-          
-          <!-- 标题居中 -->
-          <h2>小圆前端练习</h2>
-          
-          <!-- 右侧占位元素 -->
-          <div style="flex: 1;"></div>
-          
-          <!-- 恢复系统设置下拉菜单 -->
-          <div class="user-info">
-            <el-dropdown>
-              <span class="el-dropdown-link">
-                <el-icon class="el-icon--right"><Setting /></el-icon>
-                系统设置
-              </span>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item>个人中心</el-dropdown-item>
-                  <el-dropdown-item>退出登录</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
-        </el-header>
-        
-        <!-- 路由视图区域 -->
-        <el-main style="padding: 20px;">
-          <!-- 使用RouterView组件显示当前路由对应的组件 -->
-          <router-view />
-        </el-main>
-      </el-container>
-    </el-container>
+          </Suspense>
+        </RouterView>
+      </main>
+    </div>
   </div>
 </template>
 
-<style>
-/* 全局样式重置 */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+<style scoped>
+.shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 310px minmax(0, 1fr);
+  gap: 24px;
+  padding: 24px;
 }
 
-html, body {
-  height: 100%;
-  font-family: Arial, sans-serif;
+.shell-sidebar,
+.shell-main {
+  min-height: calc(100vh - 48px);
 }
 
-.app-container {
-  height: 100%;
-}
-
-/* 侧边栏样式 */
-.logo-container {
-  padding: 0;
-  height: 60px;
-  width: 100%;
+.shell-sidebar {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  border-bottom: 1px solid #1f2d3d;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.logo-text {
-  color: #fff;
-  font-size: 18px;
-  font-weight: 600;
+.brand-card,
+.sidebar-note,
+.shell-header,
+.safety-banner,
+.shell-content,
+.route-skeleton {
+  border: 1px solid rgba(26, 61, 56, 0.09);
+  background: rgba(255, 251, 246, 0.76);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 60px rgba(38, 70, 66, 0.08);
+}
+
+.brand-card {
+  padding: 28px;
+  border-radius: 28px;
+  background:
+    linear-gradient(145deg, rgba(25, 88, 81, 0.92), rgba(21, 54, 62, 0.95)),
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.14), transparent 35%);
+  color: #f8f5ef;
+}
+
+.brand-card__eyebrow,
+.shell-header__eyebrow {
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: rgba(246, 242, 232, 0.78);
+}
+
+.brand-card h1 {
+  margin: 0 0 12px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.brand-card__copy {
   margin: 0;
-  text-align: center;
+  line-height: 1.7;
+  color: rgba(248, 245, 239, 0.84);
 }
 
-.sidebar-menu {
-  border-right: none;
+.nav-list {
+  display: grid;
+  gap: 12px;
 }
 
-/* 顶部导航栏样式 */
-.user-info {
+.nav-item {
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(26, 61, 56, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+  color: #24423d;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.nav-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(25, 88, 81, 0.22);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.nav-item--active {
+  background: linear-gradient(135deg, #f3e2bf, #f7f2e8 58%, #ffffff 100%);
+  border-color: rgba(182, 117, 56, 0.24);
+  box-shadow: 0 10px 30px rgba(182, 117, 56, 0.12);
+}
+
+.nav-item__label {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.nav-item__caption {
+  font-size: 0.9rem;
+  color: rgba(36, 66, 61, 0.7);
+  line-height: 1.5;
+}
+
+.sidebar-note {
+  margin-top: auto;
+  padding: 22px;
+  border-radius: 24px;
+}
+
+.sidebar-note__title {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #7c6a55;
+}
+
+.sidebar-note p {
+  margin: 0;
+  color: #28453f;
+  line-height: 1.6;
+}
+
+.sidebar-note__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.sidebar-note__chips span,
+.shell-header__badges span {
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  color: #21504a;
+  background: rgba(32, 89, 84, 0.08);
+}
+
+.shell-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.shell-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 28px 32px;
+  border-radius: 30px;
+}
+
+.shell-header h2 {
+  margin: 0 0 8px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2.1rem;
+  color: #173e39;
+}
+
+.shell-header__eyebrow {
+  color: #8b7258;
+}
+
+.shell-header__caption {
+  margin: 0;
+  color: #536d67;
+  line-height: 1.7;
+}
+
+.shell-header__badges {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
-/* 主内容区域样式 */
-.el-main {
-  background-color: #f5f7fa;
+.safety-banner {
+  padding: 14px 20px;
+  border-radius: 20px;
+  color: #845732;
+  background:
+    linear-gradient(135deg, rgba(246, 226, 189, 0.86), rgba(255, 251, 242, 0.92));
 }
-</style>
 
-<style scoped>
-/* 组件特定样式 */
-.el-dropdown-link {
-  cursor: pointer;
+.shell-content {
+  flex: 1;
+  padding: 24px;
+  border-radius: 32px;
+  overflow: hidden;
+}
+
+.route-skeleton {
   display: flex;
   align-items: center;
-  gap: 5px;
+  justify-content: center;
+  min-height: 300px;
+  border-radius: 24px;
+  color: #5d7771;
+}
+
+@media (max-width: 1100px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .shell-sidebar,
+  .shell-main {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .shell {
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .brand-card,
+  .shell-header,
+  .shell-content {
+    border-radius: 24px;
+  }
+
+  .shell-header {
+    padding: 22px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .shell-header h2 {
+    font-size: 1.7rem;
+  }
 }
 </style>

@@ -1,37 +1,28 @@
-// 导入路由模块
 import { createRouter, createWebHistory } from 'vue-router'
 
-// 导入视图组件
-import HomeView from '../views/HomeView.vue'
-import TodoView from '../views/TodoView.vue'
-import AboutView from '../views/AboutView.vue'
-import AIVIew from '../views/AIVIew.vue'
-
-// 定义路由配置
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    name: 'dashboard',
+    component: () => import('../views/DashboardView.vue')
   },
   {
-    path: '/todo',
-    name: 'todo',
-    component: TodoView
+    path: '/workbench',
+    name: 'workbench',
+    component: () => import('../views/WorkbenchView.vue')
   },
   {
-    path: '/about',
-    name: 'about',
-    component: AboutView
+    path: '/archive',
+    name: 'archive',
+    component: () => import('../views/ArchiveView.vue')
   },
   {
-    path: '/ai',
-    name: 'ai',
-    component: AIVIew
+    path: '/system',
+    name: 'system',
+    component: () => import('../views/SystemView.vue')
   }
 ]
 
-// 创建路由实例
 const router = createRouter({
   history: createWebHistory(),
   routes
